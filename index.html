@@ -23,11 +23,7 @@
     .container { max-width: 700px; margin: 20px auto; background: var(--surface-color); padding: 25px; border-radius: 22px; box-shadow: var(--soft-shadow); }
     .header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .machine-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 450px; margin: 20px auto; }
-    .machine-icon {
-      background-color: var(--surface-color); border: 8px solid; border-radius: 50%; aspect-ratio: 1 / 1;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    }
+    .machine-icon { background-color: var(--surface-color); border: 8px solid; border-radius: 50%; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
     .machine-icon:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
     .machine-icon.status-ready { border-color: var(--success-color); }
     .machine-icon.status-cleaning { border-color: var(--warning-color); }
@@ -66,7 +62,6 @@
 
   <div id="loading-overlay"><div class="spinner"></div><p>กำลังโหลด...</p></div>
 
-  <!-- All Page HTML Structures are here -->
   <div id="home-page" class="page">
     <h1>สถานะเครื่อง EFM</h1>
     <div class="machine-grid" id="machine-grid-container"></div>
@@ -143,7 +138,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyY6sDGs6PTDXCHVTTxHiDO4PA9Y1Ed3PT88pNgGe7oZ_n9xn-Jn8vudLWc7pQ4RkYO/exec";
+  // --- UPDATED SCRIPT URL ---
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydfI1-JPjrO9qen5ulqY8L-RjvQmMG9MiEsj_pNgkIBNFhxE_jpwPA8Wr-7HP4a3tk/exec";
+  
   const pages = { home: document.getElementById('home-page'), checklist: document.getElementById('checklist-page'), edit: document.getElementById('edit-page'), summary: document.getElementById('summary-page') };
   const loadingOverlay = document.getElementById('loading-overlay');
   let appData = {};
@@ -178,8 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = await response.json();
       if (payload && payload.appData && Object.keys(payload.appData).length > 0) {
         appData = payload.appData;
-        const sheetId = SCRIPT_URL.split('/')[5];
-        document.getElementById('view-summary-log-btn').href = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=${payload.summarySheetGid}`;
+        const sheetId = payload.spreadsheetId;
+        const summaryLink = document.getElementById('view-summary-log-btn');
+        summaryLink.href = `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=${payload.summarySheetGid}`;
         renderHomePage();
         showPage('home');
       } else {
@@ -256,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('witness-name').value = '';
   };
 
-  // --- Event Listeners ---
   document.getElementById('home-page').addEventListener('click', async (e) => {
     const icon = e.target.closest('.machine-icon');
     if (icon) { renderChecklistPage(icon.dataset.machineId); showPage('checklist'); return; }
@@ -341,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // --- Initial Load ---
   loadDataAndInitializeApp();
 });
 </script>
